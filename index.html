@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So sánh Bếp Từ Thường và Bếp Từ Inverter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #333;
+        }
+        .container {
+            max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 40px; font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .cooktop-section {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease;
+        }
+        .cooktop-section:hover { transform: translateY(-5px); }
+        .cooktop-title { text-align: center; font-size: 1.8em; margin-bottom: 25px; color: #34495e; }
+        .cooktop-visual {
+            position: relative; height: 300px; background: #2c3e50; border-radius: 10px; margin-bottom: 25px;
+            overflow: hidden; box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .power-coil {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 15px; background: #e74c3c; border-radius: 7px; box-shadow: 0 0 20px #e74c3c;
+        }
+        .magnetic-field { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 160px; height: 100px; }
+        .field-line { position: absolute; border: 2px solid #3498db; border-radius: 50%; opacity: 0.7; animation: pulse 2s infinite; }
+        .field-line:nth-child(1) { width: 60px; height: 30px; top: 35px; left: 50px; animation-delay: 0s; }
+        .field-line:nth-child(2) { width: 100px; height: 50px; top: 25px; left: 30px; animation-delay: 0.3s; }
+        .field-line:nth-child(3) { width: 140px; height: 70px; top: 15px; left: 10px; animation-delay: 0.6s; }
+        .pot {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 80px; background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+            border-radius: 10px 10px 5px 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .pot::before { content: ''; position: absolute; bottom: -5px; left: 10%; right: 10%; height: 8px; background: #34495e; border-radius: 4px; }
+        .heat-indicator { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 100px; height: 60px; }
+        .heat-wave { position: absolute; width: 20px; height: 3px; background: #f39c12; border-radius: 2px; opacity: 0.8; animation: heatWave 1.5s infinite; }
+        .heat-wave:nth-child(1) { left: 20px; top: 10px; animation-delay: 0s; }
+        .heat-wave:nth-child(2) { left: 40px; top: 20px; animation-delay: 0.2s; }
+        .heat-wave:nth-child(3) { left: 60px; top: 10px; animation-delay: 0.4s; }
+        .heat-wave:nth-child(4) { left: 30px; top: 30px; animation-delay: 0.6s; }
+        .heat-wave:nth-child(5) { left: 50px; top: 40px; animation-delay: 0.8s; }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .power-btn {
+            background: linear-gradient(145deg, #3498db, #2980b9); color: white; border: none; padding: 12px 24px;
+            border-radius: 25px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+        }
+        .power-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(52,152,219,0.4); }
+        .power-btn:active { transform: translateY(0); }
+        .power-btn.active { background: linear-gradient(145deg, #e74c3c, #c0392b); box-shadow: 0 5px 15px rgba(231,76,60,0.3); }
+        .power-display {
+            background: #2c3e50; color: #ecf0f1; padding: 10px 20px; border-radius: 10px; font-size: 18px; font-weight: bold; min-width: 120px; text-align: center;
+        }
+        .efficiency-bar { width: 100%; height: 20px; background: #ecf0f1; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .efficiency-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60); transition: width 0.5s ease; }
+        .features { list-style: none; }
+        .features li { padding: 8px 0; display: flex; align-items: center; }
+        .features li::before { content: '✓'; color: #27ae60; font-weight: bold; margin-right: 10px; }
+        .power-curve { width: 100%; height: 100px; background: #34495e; border-radius: 5px; margin: 15px 0; position: relative; overflow: hidden; }
+        .curve-line { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: #3498db; transition: all 0.3s ease; }
+        .normal-curve-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: #e74c3c; transition: height 0.3s ease; }
+        .inverter-wave { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
+        .wave-path { stroke: #27ae60; stroke-width: 3; fill: none; stroke-linecap: round; }
+        .dc-indicator, .ac-indicator {
+            position: absolute; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .dc-indicator { top: 5px; left: 5px; background: #3498db; }
+        .ac-indicator { top: 5px; right: 5px; background: #27ae60; }
+        @keyframes pulse { 0%,100%{opacity:0.3; transform:scale(1);} 50%{opacity:0.8; transform:scale(1.05);} }
+        @keyframes heatWave { 0%{opacity:0; transform:translateY(0);} 50%{opacity:1;} 100%{opacity:0; transform:translateY(-20px);} }
+        .info-panel { background: linear-gradient(145deg, #ecf0f1, #bdc3c7); border-radius: 10px; padding: 20px; margin-top: 30px; }
+        .info-title { font-size: 1.5em; color: #2c3e50; margin-bottom: 15px; text-align: center; }
+        .comparison-table {
+            width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .comparison-table th, .comparison-table td { padding: 15px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        .comparison-table th { background: linear-gradient(145deg, #3498db, #2980b9); color: white; font-weight: bold; }
+        .comparison-table tr:hover { background: #f8f9fa; }
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+            h1 { font-size: 2em; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>So Sánh Bếp Từ Thường và Bếp Từ Inverter</h1>
+
+        <div class="comparison">
+            <!-- Bếp Từ Thường -->
+            <div class="cooktop-section">
+                <h2 class="cooktop-title">Bếp Từ Thường</h2>
+                <div class="cooktop-visual" id="normal-cooktop">
+                    <div class="pot">
+                        <div class="heat-indicator" id="normal-heat">
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                        </div>
+                    </div>
+                    <div class="magnetic-field" id="normal-field">
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="power-coil" id="normal-coil"></div>
+                </div>
+
+                <div class="controls">
+                    <button class="power-btn" id="normal-power-btn" onclick="toggleNormalCooktop()" aria-pressed="false" aria-label="Bật/Tắt bếp từ thường">BẬT/TẮT</button>
+                    <div class="power-display" id="normal-power-display">Tắt</div>
+                </div>
+
+                <div class="power-curve">
+                    <div class="normal-curve-bar" id="normal-curve" style="height: 0%;"></div>
+                </div>
+
+                <div>Hiệu suất điện:</div>
+                <div class="efficiency-bar">
+                    <div class="efficiency-fill" id="normal-efficiency" style="width: 75%;"></div>
+                </div>
+
+                <ul class="features">
+                    <li>Hoạt động theo chu kỳ bật/tắt</li>
+                    <li>Công suất cố định theo cấp độ</li>
+                    <li>Hiệu suất trung bình 75-80%</li>
+                    <li>Giá thành phải chăng</li>
+                    <li>Ngưng hoạt động 3-5 giây định kỳ</li>
+                </ul>
+            </div>
+
+            <!-- Bếp Từ Inverter -->
+            <div class="cooktop-section">
+                <h2 class="cooktop-title">Bếp Từ Inverter</h2>
+                <div class="cooktop-visual" id="inverter-cooktop">
+                    <div class="pot">
+                        <div class="heat-indicator" id="inverter-heat">
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                            <div class="heat-wave"></div>
+                        </div>
+                    </div>
+                    <div class="magnetic-field" id="inverter-field">
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="power-coil" id="inverter-coil"></div>
+                </div>
+
+                <div class="controls">
+                    <button class="power-btn" id="inverter-power-btn" onclick="toggleInverterCooktop()" aria-pressed="false" aria-label="Bật/Tắt bếp từ inverter">BẬT/TẮT</button>
+                    <div class="power-display" id="inverter-power-display">Tắt</div>
+                </div>
+
+                <div class="power-curve">
+                    <svg class="inverter-wave" id="inverter-curve" viewBox="0 0 300 100">
+                        <path class="wave-path" d="M 0 50 Q 25 20, 50 50 T 100 50 T 150 50 T 200 50 T 250 50 T 300 50"/>
+                    </svg>
+                    <div class="dc-indicator" id="dc-indicator">DC</div>
+                    <div class="ac-indicator" id="ac-indicator">AC</div>
+                </div>
+
+                <div>Hiệu suất điện:</div>
+                <div class="efficiency-bar">
+                    <div class="efficiency-fill" id="inverter-efficiency" style="width: 92%;"></div>
+                </div>
+
+                <ul class="features">
+                    <li>Chuyển đổi DC-AC liên tục</li>
+                    <li>Từ trường biến thiên theo tần số</li>
+                    <li>Hiệu suất cao 90-95%</li>
+                    <li>Tiết kiệm điện năng đáng kể</li>
+                    <li>Điều khiển nhiệt độ ổn định</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3 class="info-title">Bảng So Sánh Chi Tiết</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Tiêu chí</th>
+                        <th>Bếp Từ Thường</th>
+                        <th>Bếp Từ Inverter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Cơ chế hoạt động</strong></td>
+                        <td>Bật/Tắt theo chu kỳ</td>
+                        <td>Chuyển đổi DC-AC liên tục</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Điều khiển công suất</strong></td>
+                        <td>Theo cấp độ cố định (1-9)</td>
+                        <td>Liên tục, chính xác từng độ</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hiệu suất điện</strong></td>
+                        <td>75-80%</td>
+                        <td>90-95%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tiết kiệm điện</strong></td>
+                        <td>Trung bình</td>
+                        <td>Cao (tiết kiệm 15-20%)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ổn định nhiệt độ</strong></td>
+                        <td>Biến động theo chu kỳ</td>
+                        <td>Ổn định, liên tục</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Giá thành</strong></td>
+                        <td>Phải chăng</td>
+                        <td>Cao hơn 20-30%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ===== Trạng thái & biến toàn cục =====
+        let normalCooktopOn = false;
+        let inverterCooktopOn = false;
+        let normalPowerLevel = 0;
+        let inverterPowerLevel = 0;
+        let normalCycleInterval = null;
+
+        // Âm thanh
+        let normalAudio = new Audio('./the-sound-of-the-electromagnetic-field.mp3');
+        let inverterAudio = new Audio('./the-sound-of-the-electromagnetic-field.mp3');;
+        let clickAudio = new Audio('./short-deaf-click-of-the-zoom-key.mp3');
+        let audioReady = new Audio('./the-sound-of-the-electromagnetic-field.mp3');; // cờ boolean chuẩn
+
+        // ===== Khởi tạo âm thanh =====
+        function initAudio() {
+            if (audioReady) return;
+            try {
+                normalAudio = new Audio('normal-cooktop-sound.mp3');
+                normalAudio.loop = false;
+                normalAudio.volume = 0.5;
+                normalAudio.preload = 'auto';
+                normalAudio.addEventListener('error', (e) => {
+                    console.warn('Không tải được normal-cooktop-sound.mp3', e);
+                });
+
+                inverterAudio = new Audio('inverter-cooktop-sound.mp3');
+                inverterAudio.loop = true;
+                inverterAudio.volume = 0.5;
+                inverterAudio.preload = 'auto';
+                inverterAudio.addEventListener('error', (e) => {
+                    console.warn('Không tải được inverter-cooktop-sound.mp3', e);
+                });
+
+                // Âm click khi bếp thường ngắt / chạy lại
+                clickAudio = new Audio('short-deaf-click-of-the-zoom-key.mp3');
+                clickAudio.loop = false;
+                clickAudio.volume = 0.6;
+                clickAudio.preload = 'auto';
+                clickAudio.addEventListener('error', (e) => {
+                    console.warn('Không tải được short-deaf-click-of-the-zoom-key.mp3', e);
+                });
+
+                audioReady = true;
+                console.log('✅ Audio initialized');
+            } catch (error) {
+                console.error('Lỗi khi khởi tạo audio:', error);
+            }
+        }
+
+        // ====== BẾP THƯỜNG ======
+        function toggleNormalCooktop() {
+            if (!audioReady) initAudio();
+
+            const btn = document.getElementById('normal-power-btn');
+            const display = document.getElementById('normal-power-display');
+
+            normalCooktopOn = !normalCooktopOn;
+            btn.setAttribute('aria-pressed', String(normalCooktopOn));
+
+            if (normalCooktopOn) {
+                btn.classList.add('active');
+                btn.textContent = 'ĐANG HOẠT ĐỘNG';
+                normalPowerLevel = Math.floor(Math.random() * 4) + 5;
+                display.textContent = `Cấp ${normalPowerLevel}`;
+                startNormalCycle();
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = 'BẬT/TẮT';
+                display.textContent = 'Tắt';
+                normalPowerLevel = 0;
+
+                if (normalCycleInterval) {
+                    clearInterval(normalCycleInterval);
+                    normalCycleInterval = null;
+                }
+                turnOffNormalEffects();
+            }
+        }
+
+        function startNormalCycle() {
+            let isOn = true;
+
+            // (Tuỳ chọn) nếu muốn kêu "click" ngay lúc bắt đầu bật lần đầu:
+            // if (clickAudio) { clickAudio.currentTime = 0; clickAudio.play().catch(()=>{}); }
+
+            turnOnNormalEffects();
+
+            // Chu kỳ 8 giây: đang ON -> chuyển OFF (nghỉ 3–5s) -> ON lại
+            normalCycleInterval = setInterval(() => {
+                if (normalCooktopOn && isOn) {
+                    // --- NGẮT ---
+                    turnOffNormalEffects();
+                    if (clickAudio) {
+                        clickAudio.currentTime = 0;
+                        clickAudio.play().catch(()=>{});
+                    }
+                    isOn = false;
+
+                    const pauseTime = 3000 + Math.random() * 2000; // 3–5s
+                    setTimeout(() => {
+                        if (normalCooktopOn && !isOn) {
+                            // --- CHẠY LẠI ---
+                            if (clickAudio) {
+                                clickAudio.currentTime = 0;
+                                clickAudio.play().catch(()=>{});
+                            }
+                            turnOnNormalEffects();
+                            isOn = true;
+                        }
+                    }, pauseTime);
+                }
+            }, 8000);
+        }
+
+        function turnOnNormalEffects() {
+            const coil = document.getElementById('normal-coil');
+            const field = document.getElementById('normal-field');
+            const heat = document.getElementById('normal-heat');
+            const curve = document.getElementById('normal-curve');
+            const efficiency = document.getElementById('normal-efficiency');
+
+            coil.style.boxShadow = `0 0 ${normalPowerLevel * 5}px #e74c3c`;
+            field.style.opacity = '1';
+            heat.style.opacity = '1';
+            curve.style.height = '70%';
+            efficiency.style.width = '75%';
+
+            const fieldLines = field.querySelectorAll('.field-line');
+            fieldLines.forEach((line, index) => {
+                line.style.borderColor = '#3498db';
+                line.style.animation = `pulse ${2 - index * 0.2}s infinite`;
+            });
+
+            const heatWaves = heat.querySelectorAll('.heat-wave');
+            heatWaves.forEach((wave, index) => {
+                wave.style.animation = `heatWave ${1.5 - index * 0.1}s infinite`;
+                wave.style.animationDelay = `${index * 0.2}s`;
+            });
+
+            if (normalAudio) {
+                normalAudio.currentTime = 0;
+                normalAudio.play().catch(err => {
+                    console.error('❌ Không thể phát âm thanh bếp thường:', err);
+                });
+            }
+        }
+
+        function turnOffNormalEffects() {
+            const coil = document.getElementById('normal-coil');
+            const field = document.getElementById('normal-field');
+            const heat = document.getElementById('normal-heat');
+            const curve = document.getElementById('normal-curve');
+            const efficiency = document.getElementById('normal-efficiency');
+
+            coil.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.3)';
+            field.style.opacity = '0.2';
+            heat.style.opacity = '0.2';
+            curve.style.height = '0%';
+            efficiency.style.width = '0%';
+
+            if (normalAudio) {
+                normalAudio.pause();
+                normalAudio.currentTime = 0;
+            }
+        }
+
+        // ====== BẾP INVERTER ======
+        let inverterAnimationInterval = null;
+
+        function toggleInverterCooktop() {
+            if (!audioReady) initAudio();
+
+            const btn = document.getElementById('inverter-power-btn');
+            const display = document.getElementById('inverter-power-display');
+
+            inverterCooktopOn = !inverterCooktopOn;
+            btn.setAttribute('aria-pressed', String(inverterCooktopOn));
+
+            if (inverterCooktopOn) {
+                btn.classList.add('active');
+                btn.textContent = 'ĐANG HOẠT ĐỘNG';
+                inverterPowerLevel = Math.floor(Math.random() * 20) + 70;
+                display.textContent = `${inverterPowerLevel}%`;
+                startInverterAnimation();
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = 'BẬT/TẮT';
+                display.textContent = 'Tắt';
+                inverterPowerLevel = 0;
+
+                if (inverterAnimationInterval) {
+                    clearInterval(inverterAnimationInterval);
+                    inverterAnimationInterval = null;
+                }
+                turnOffInverterEffects();
+            }
+        }
+
+        function startInverterAnimation() {
+            const coil = document.getElementById('inverter-coil');
+            const field = document.getElementById('inverter-field');
+            const heat = document.getElementById('inverter-heat');
+            const wavePath = document.querySelector('.wave-path');
+            const dcIndicator = document.getElementById('dc-indicator');
+            const acIndicator = document.getElementById('ac-indicator');
+            const efficiency = document.getElementById('inverter-efficiency');
+
+            coil.style.boxShadow = `0 0 30px #27ae60`;
+            coil.style.background = 'linear-gradient(45deg, #e74c3c, #f39c12)';
+            field.style.opacity = '1';
+            heat.style.opacity = '1';
+            efficiency.style.width = '92%';
+
+            const fieldLines = field.querySelectorAll('.field-line');
+            fieldLines.forEach((line, index) => {
+                line.style.borderColor = '#27ae60';
+                line.style.animation = `pulse ${1.5 - index * 0.1}s infinite`;
+            });
+
+            const heatWaves = heat.querySelectorAll('.heat-wave');
+            heatWaves.forEach((wave, index) => {
+                wave.style.animation = `heatWave ${1.2 - index * 0.05}s infinite`;
+                wave.style.animationDelay = `${index * 0.1}s`;
+                wave.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+            });
+
+            if (inverterAudio) {
+                inverterAudio.currentTime = 0;
+                inverterAudio.play().catch(err => {
+                    console.error('❌ Không thể phát âm thanh bếp inverter:', err);
+                });
+            }
+
+            let phase = 0;
+            inverterAnimationInterval = setInterval(() => {
+                if (!inverterCooktopOn) return;
+                phase += 0.1;
+
+                let pathD = 'M 0 50';
+                for (let x = 0; x <= 300; x += 5) {
+                    const y = 50 + 25 * Math.sin((x / 30) + phase);
+                    pathD += ` L ${x} ${y}`;
+                }
+                wavePath.setAttribute('d', pathD);
+
+                const cycle = Math.floor(phase) % 2;
+                if (cycle === 0) {
+                    dcIndicator.style.opacity = '1';
+                    dcIndicator.style.transform = 'scale(1.1)';
+                    acIndicator.style.opacity = '0.3';
+                    acIndicator.style.transform = 'scale(0.9)';
+                    wavePath.style.stroke = '#3498db';
+                } else {
+                    dcIndicator.style.opacity = '0.3';
+                    dcIndicator.style.transform = 'scale(0.9)';
+                    acIndicator.style.opacity = '1';
+                    acIndicator.style.transform = 'scale(1.1)';
+                    wavePath.style.stroke = '#27ae60';
+                }
+            }, 50);
+        }
+
+        function turnOffInverterEffects() {
+            const coil = document.getElementById('inverter-coil');
+            const field = document.getElementById('inverter-field');
+            const heat = document.getElementById('inverter-heat');
+            const wavePath = document.querySelector('.wave-path');
+            const dcIndicator = document.getElementById('dc-indicator');
+            const acIndicator = document.getElementById('ac-indicator');
+            const efficiency = document.getElementById('inverter-efficiency');
+
+            coil.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.3)';
+            coil.style.background = '#e74c3c';
+            field.style.opacity = '0.2';
+            heat.style.opacity = '0.2';
+            efficiency.style.width = '0%';
+
+            wavePath.setAttribute('d', 'M 0 50 L 300 50');
+            wavePath.style.stroke = '#666';
+            dcIndicator.style.opacity = '0.3';
+            acIndicator.style.opacity = '0.3';
+
+            if (inverterAudio) {
+                inverterAudio.pause();
+                inverterAudio.currentTime = 0;
+            }
+        }
+
+        // Khởi tạo trạng thái tắt ban đầu
+        turnOffNormalEffects();
+        turnOffInverterEffects();
+    </script>
+</body>
+</html>
